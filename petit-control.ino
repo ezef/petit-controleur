@@ -1,18 +1,3 @@
-/*
- * Demonstrate using an http server and an HTML form to control an LED.
- * The http server runs on the ESP8266.
- *
- * Connect to "http://esp8266WebForm.local" or "http://<IP address>"
- * to bring up an HTML form to control the LED connected GPIO#0. This works
- * for the Adafruit ESP8266 HUZZAH but the LED may be on a different pin on
- * other breakout boards.
- *
- * Imperatives to turn the LED on/off using a non-browser http client.
- * For example, using wget.
- * $ wget http://esp8266webform.local/ledon
- * $ wget http://esp8266webform.local/ledoff
-*/
-
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -37,13 +22,13 @@ float tempsensada1;
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
-DeviceAddress direccionsensor1 = { 0x28, 0xEE, 0xE3, 0xF, 0x15, 0x16, 0x2, 0xAF };
 
 Tempo t_temp(30*1000); // temporizador para la lectura de temperatura
-unsigned long ultimoTiempo;
 
 ESP8266WebServer server(80);
-WiFiClientSecure client;
+IPAddress local_IP(192,168,1,1);
+IPAddress gateway(192,168,1,1);
+IPAddress subnet(255,255,255,0);
 
 String html_principal(){
 String ret="pepe";
@@ -60,6 +45,12 @@ void returnFail(String msg)
   server.sendHeader("Connection", "close");
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(500, "text/plain", msg + "\r\n");
+}
+
+void redirectHome()
+{
+  server.sendHeader("Location", "/",true); 
+  server.send(302, "text/plain",""); 
 }
 
 void handleSubmit()
@@ -104,7 +95,7 @@ void setferm1(){
     tempset1= (byte)server.arg("tempset").toInt();
     EEPROM.put(ADDR1,tempset1);
     EEPROM.commit();
-    returnOK();
+    redirectHome();
   }else{
     returnFail("Temperatura seteada Vacia");
   }  
@@ -117,18 +108,16 @@ void setup(void)
   delay(10);
   sensors.begin();
   delay(10);
+  WiFi.softAPConfig(local_IP, gateway, subnet)
+  delay(10);
+  WiFi.softAP("Mason");
   delay(10);
   Serial.println("");
-  ultimoTiempo=millis();
-
-  // Wait for connection
 
   server.on("/", handleRoot);
   server.on("/ferm1", setferm1);
   server.onNotFound(handleNotFound);
-
   server.begin();
-  Serial.print("Connect to http://");
 
   tempset1= EEPROM.read(ADDR1);
 
@@ -142,7 +131,7 @@ void setup(void)
 }
 void getTemps(){
   sensors.requestTemperatures();
-  tempsensada1= sensors.getTempC(direccionsensor1);
+  tempsensada1= sensors.getTempCByIndex(0);
 }
 
 void control(){
@@ -168,6 +157,5 @@ void loop(void)
   server.handleClient();
   if (t_temp.state()){ // realiza la lectura de la temperatura, actualiza el lcd y comanda los relays.
     control();
-  }
-  
+  }  
 }
