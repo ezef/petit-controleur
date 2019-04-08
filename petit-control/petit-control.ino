@@ -5,7 +5,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <tempo.h>
-#include "constantes.h"
+#include <FS.h>
 
 #define ADDR1 0 //direccion de la EEPROM para la tempSet1
 
@@ -31,11 +31,17 @@ IPAddress gateway(192,168,1,1);
 IPAddress subnet(255,255,255,0);
 
 String html_principal(){
+String estado="<span class=\"label label-danger\">Off</span>";
+
+if (relay1){
+  estado="<span class=\"label label-success\">On</span>";
+}
+  
 String ret="<html><head>"
 "    <title>Control Masonico</title>"
 " <meta charset=\"utf-8\"> "
 " <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
-" <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\">"
+" <link rel=\"stylesheet\" href=\"bootstrap.min.css\">"
 "</head>"
 ""
 "<body>"
@@ -49,11 +55,12 @@ String ret="<html><head>"
 "       <div class=\"form-group\">"
 "           <label for=\"sarasa\">Temp heladera: <span class=\"label label-primary\"> ";
 ret += tempsensada1;
-ret+= "</span></label>"
-"           <span class=\"label label-default\">";
+ret+= "°</span></label>"
+"           <span class=\"label label-default\">Set: ";
 ret += tempset1;
-ret+= "</span>"
-"           <input type=\"text\" class=\"form-control\" name=\"tempset\">"
+ret+= "°</span>";
+ret+= estado;
+ret+="           <input type=\"number\" class=\"form-control\" name=\"tempset\" autocomplete=\"off\">"
 "       </div>"
 "       <div class=\"form-group\">"
 "         <input type=\"submit\" class=\"btn btn-default\" value=\"Enviar\"> "
@@ -132,6 +139,12 @@ void setferm1(){
     returnFail("Temperatura seteada Vacia");
   }  
 }
+void bootstrap()
+{
+  File file = SPIFFS.open("/bootstrap.min.css.gz", "r"); 
+  size_t sent = server.streamFile(file, "text/css");
+}
+
 void setup(void)
 {
   Serial.begin(115200);
@@ -140,7 +153,7 @@ void setup(void)
   delay(10);
   sensors.begin();
   delay(10);
-  WiFi.softAPConfig(local_IP, gateway, subnet)
+  WiFi.softAPConfig(local_IP, gateway, subnet);
   delay(10);
   WiFi.softAP("Mason");
   delay(10);
@@ -148,8 +161,12 @@ void setup(void)
 
   server.on("/", handleRoot);
   server.on("/ferm1", setferm1);
+  server.on("/bootstrap.min.css", bootstrap);
+  server.on("bootstrap.min.css", bootstrap);
   server.onNotFound(handleNotFound);
   server.begin();
+
+  SPIFFS.begin(); 
 
   tempset1= EEPROM.read(ADDR1);
 
