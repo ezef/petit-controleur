@@ -31,7 +31,39 @@ IPAddress gateway(192,168,1,1);
 IPAddress subnet(255,255,255,0);
 
 String html_principal(){
-String ret="pepe";
+String ret="<html><head>"
+"    <title>Control Masonico</title>"
+" <meta charset=\"utf-8\"> "
+" <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+" <link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\">"
+"</head>"
+""
+"<body>"
+"<div class=\"container-fluid\">"
+" <div class=\"well\">"
+"    <h1>Control Masonico</h1>"
+" </div>"
+" <div class=\"row\">"
+"   <div class=\"col-md-6 \">"
+"     <form action=\"/ferm1\" method=\"post\">"
+"       <div class=\"form-group\">"
+"           <label for=\"sarasa\">Temp heladera: <span class=\"label label-primary\"> ";
+ret += tempsensada1;
+ret+= "</span></label>"
+"           <span class=\"label label-default\">";
+ret += tempset1;
+ret+= "</span>"
+"           <input type=\"text\" class=\"form-control\" name=\"tempset\">"
+"       </div>"
+"       <div class=\"form-group\">"
+"         <input type=\"submit\" class=\"btn btn-default\" value=\"Enviar\"> "
+"       </div>"
+"     </form>"
+"   </div>"
+" </div>"
+"</div>"
+"</body>"
+"</html>";
 return ret;
 }
 
