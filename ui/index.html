@@ -6,12 +6,12 @@
 </head>
 
 <body>
-<div class="container-fluid">
-	<div class="well">
-    <h1>Control Masonico</h1>
-	</div>
+<div class="container">
 	<div class="row">
-		<div class="col-md-6 ">
+		<div class="col-md-6 col-md-offset-3 ">
+			<div class="well">
+		    <h1>Control Masonico</h1>
+			</div>
 			<form action="/ferm1" method="post">
 				<div class="form-group">
 						<label for="sarasa">Temp heladera: <span class="label label-primary"> 12.37º</span></label>
@@ -20,8 +20,16 @@
 						<input type="number" class="form-control" name="tempset" autocomplete="off">
 				</div>
 				<div class="form-group">
-			 		<input type="submit" class="btn btn-lg" value="Enviar"> 
+			 		<input type="submit" class="btn btn-primary" value="Enviar e iniciar modo simple"> 
 				</div>
+			</form>
+			<hr>
+			<h4>Curva de temperaturas</h4>
+			<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+			<canvas id="chartjs" width="400" height="400"></canvas>
+
+			<form action="/curva-temperaturas" method="POST"> 
+
 			</form>
 		</div>	
 	</div>	
@@ -30,3 +38,66 @@
 </body>
 
 </html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.js" integrity="sha256-xWq811jWtpNFuV8sXFtLWGYcNdTdHKe4phSg0svZIt0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js" integrity="sha256-nZaxPHA2uAaquixjSDX19TmIlbRNCOrf5HO1oHl5p70=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		console.log('here I am');
+
+
+
+	var chart = new CanvasJS.Chart("chartContainer", {
+		animationEnabled: true,
+		theme: "light2",
+		title:{
+			text: "Simple Line Chart"
+		},
+		axisY:{
+			includeZero: false
+		},
+		data: [{        
+			type: "line",
+	      	indexLabelFontSize: 16,
+			dataPoints: [
+				{ y: 450 },
+				{ y: 414},
+				{ y: 520, indexLabel: "\u2191 highest",markerColor: "red", markerType: "triangle" },
+				{ y: 460 },
+				{ y: 450 },
+				{ y: 500 },
+				{ y: 480 },
+				{ y: 480 },
+				{ y: 410 , indexLabel: "\u2193 lowest",markerColor: "DarkSlateGrey", markerType: "cross" },
+				{ y: 500 },
+				{ y: 480 },
+				{ y: 510 }
+			]
+		}]
+	});
+	chart.render();	
+
+	var ctx = document.getElementById('chartjs').getContext('2d');
+
+	var myLineChart = new Chart(ctx, {
+    type: 'scatter',
+    data:{
+        datasets: [{
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: [{x:1,y:1},{x:3,y:3},{x:2,y:1}]
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                type: 'linear',
+                position: 'bottom'
+            }]
+        }
+    }
+	});
+
+	}) // document.ready
+
+</script>
