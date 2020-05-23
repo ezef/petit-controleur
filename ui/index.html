@@ -1,103 +1,307 @@
-<html><head>
-    <title>Control Masonico</title>
-	<meta charset="utf-8"> 
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-</head>
+<html>
+	<head>
+		<title>Control Masonico</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	</head>
 
-<body>
-<div class="container">
-	<div class="row">
-		<div class="col-md-6 col-md-offset-3 ">
-			<div class="well">
-		    <h1>Control Masonico</h1>
-			</div>
-			<form action="/ferm1" method="post">
-				<div class="form-group">
-						<label for="sarasa">Temp heladera: <span class="label label-primary"> 12.37º</span></label>
-						<span class="label label-default">Set: 18º</span>
-						<span class="label label-danger">Off</span>
-						<input type="number" class="form-control" name="tempset" autocomplete="off">
-				</div>
-				<div class="form-group">
-			 		<input type="submit" class="btn btn-primary" value="Enviar e iniciar modo simple"> 
-				</div>
-			</form>
-			<hr>
-			<h4>Curva de temperaturas</h4>
-			<div id="chartContainer" style="height: 300px; width: 100%;"></div>
-			<canvas id="chartjs" width="400" height="400"></canvas>
-
-			<form action="/curva-temperaturas" method="POST"> 
-
-			</form>
-		</div>	
-	</div>	
-</div>
-
-</body>
-
+	<body>
+		<div class="container">
+			<div id="main"></div>
+		</div>
+	<style>
+		.label-indicator {
+			font-size: 15px;
+		}
+		.mr2 {
+			margin-right: 2em;
+		}
+	</style>
+	</body>
 </html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.js" integrity="sha256-xWq811jWtpNFuV8sXFtLWGYcNdTdHKe4phSg0svZIt0=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js" integrity="sha256-nZaxPHA2uAaquixjSDX19TmIlbRNCOrf5HO1oHl5p70=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js" integrity="sha256-ufGElb3TnOtzl5E4c/qQnZFGP+FYEZj5kbSEdJNrw0A=" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/axios/dist/axios.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js" integrity="sha256-8zyeSXm+yTvzUN1VgAOinFgaVFEFTyYzWShOy9w7WoQ=" crossorigin="anonymous"></script>
+
+<!--language=HTML language=HTML prefix=<template id="main-template"> suffix=</template> -->
+<template id="main-template">
+	<div>
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2 ">
+				<div class="well">
+					<h1>Control Masonico</h1>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">Indicadores</div>
+					<div class="panel-body">
+						<span class="mr2">
+							Lectura: <span class="label label-primary label-indicator"> {{ indicators.tempSensed}}º</span>
+						</span>
+
+						<span class="mr2">
+							Set actual:<span class="label label-default label-indicator">{{ indicators.actualTempSet }}º</span>
+						</span>
+
+						<span class="">
+							Estado actuador:
+							<span v-if="indicators.actuatorStarted" class="label label-success label-indicator">On</span>
+							<span v-else="!indicators.actuatorStarted" class="label label-danger label-indicator">Off</span>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2 ">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						Modo Simple <span class="hidden-xs">(Temperatura constante)</span>
+						<span v-if="simpleMode.status == 'active'" class="label label-success pull-right">Activado</span>
+						<span v-else class="label label-warning pull-right">Desactivado</span>
+					</div>
+
+					<div class="panel-body form-inline">
+						<div class="form-group">
+							<label for="tempSet">Temperatura heladera: </label>
+							<input type="number" class="form-control" autocomplete="off" style="max-width: 80px;">
+						</div>
+							<input type="submit" class="btn btn-primary" value="Enviar">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2">
+
+
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						Modo escalonado <span class="hidden-xs">(Temperatura escalonada segun parametros)</span>
+						<span v-if="steppedMode.status == 'active'" class="label label-success pull-right">Activado</span>
+						<span v-else class="label label-warning pull-right">Desactivado</span>
+					</div>
+					<div class="panel-body">
+						<canvas id="myChart"></canvas>
+
+
+						<table class="table" width="100%">
+							<thead>
+								<th>Temperatura</th>
+								<th>Tiempo</th>
+								<th>Accion</th>
+							</thead>
+							<tbody>
+							<tr v-for="(step,index) in steppedMode.steps" :key="index">
+								<td>{{ step.temp }}º</td>
+								<td>{{ step.hours}} hs</td>
+								<td><button class="btn btn-danger btn" @click="deleteStep(index)" style="width: 50px;">-</button></td>
+							</tr>
+							<tr>
+								<td><input class="form-control"v-model="steppedMode.newStep.temp" type="number" max="50" min="0" style="max-width:80px;"></td>
+								<td><input class="form-control" v-model="steppedMode.newStep.hours" type="number" min="1"style="max-width:80px"></td>
+								<td><button class="btn btn-success btn" @click="addNewStep()" style="width: 50px;">+</button></td>
+							</tr>
+							</tbody>
+						</table>
+
+						<button class="btn btn-primary pull-right"> Activar modo escalonado</button>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
 <script type="text/javascript">
-	$(document).ready(function(){
-		console.log('here I am');
+	const BASE_URL = window.location.hostname;
 
-
-
-	var chart = new CanvasJS.Chart("chartContainer", {
-		animationEnabled: true,
-		theme: "light2",
-		title:{
-			text: "Simple Line Chart"
+	const app = new Vue({
+		el: '#main',
+		data: {
+			indicators:{
+				actuatorStarted:true,
+				tempSensed:12.37,
+				actualTempSet:10,
+			},
+			simpleMode:{
+				tempSet:10,
+				status:'active',
+			},
+			steppedMode:{
+				status:'inactive',
+				steps:[
+					{ temp:16, hours:48},
+					{ temp:18, hours:24},
+					{ temp:35, hours:96}
+				],
+				newStep:{
+					temp:undefined,
+					hours:undefined
+				},
+				hoursSinceControlStarted:1525, // Coming from NodeMC
+				temperatureSetted: 35, // Coming from NodeMCU
+			},
 		},
-		axisY:{
-			includeZero: false
+		template: '#main-template',
+		methods: {
+			deleteStep(index){
+				console.log(index);
+				this.steppedMode.steps.splice(index, 1);
+				this.loadTemperatureStepsToChart();
+			},
+			addNewStep(){
+				let step = {
+					temp:parseInt(this.steppedMode.newStep.temp),
+					hours:parseInt(this.steppedMode.newStep.hours),
+				};
+
+				this.steppedMode.steps.push(step);
+				this.steppedMode.newStep.temp = undefined;
+				this.steppedMode.newStep.hours = undefined;
+				this.loadTemperatureStepsToChart();
+			},
+			loadTemperatureStepsToChart(){
+				let acummulatedHours = 0;
+				// let acummulatedHours = this.steppedMode.steps[0].hours;
+				let cartesianPoints = [];
+				if (this.steppedMode.steps.length > 0){
+					this.steppedMode.steps.forEach( function(el){
+						cartesianPoints.push({x: acummulatedHours, y:el.temp });
+						acummulatedHours += el.hours;
+					});
+
+					//Add last point
+					cartesianPoints.push({x: acummulatedHours, y:this.steppedMode.steps.slice(-1).pop().temp });
+				}
+
+				// console.log(cartesianPoints);
+				temperatureChart.data.datasets[0].data = cartesianPoints;
+				temperatureChart.update();
+				// temperatureChart.data.datasets[0].data.push({x:50,y:5});
+			},
+			loadElapsedGraph(){
+				let acummulatedHours = 0;
+				// let acummulatedHours = this.steppedMode.steps[0].hours;
+				let cartesianPoints = [];
+				let hoursSinceControlStarted = this.steppedMode.hoursSinceControlStarted;
+				if (this.steppedMode.steps.length > 0){
+					this.steppedMode.steps.forEach( function(el){
+						if ( acummulatedHours < hoursSinceControlStarted ){
+							cartesianPoints.push({x: acummulatedHours, y:el.temp });
+							acummulatedHours += el.hours;
+						}
+					});
+
+					//Add last point
+					cartesianPoints.push({x: this.steppedMode.hoursSinceControlStarted, y:this.steppedMode.temperatureSetted});
+				}
+
+				console.log(cartesianPoints);
+				temperatureChart.data.datasets[1].data = cartesianPoints;
+				temperatureChart.update();
+			}
 		},
-		data: [{        
-			type: "line",
-	      	indexLabelFontSize: 16,
-			dataPoints: [
-				{ y: 450 },
-				{ y: 414},
-				{ y: 520, indexLabel: "\u2191 highest",markerColor: "red", markerType: "triangle" },
-				{ y: 460 },
-				{ y: 450 },
-				{ y: 500 },
-				{ y: 480 },
-				{ y: 480 },
-				{ y: 410 , indexLabel: "\u2193 lowest",markerColor: "DarkSlateGrey", markerType: "cross" },
-				{ y: 500 },
-				{ y: 480 },
-				{ y: 510 }
+		mounted(){
+			setTimeout( function(){
+				app.loadTemperatureStepsToChart();
+				app.loadElapsedGraph();
+			}, 100);
+		}
+	});
+
+	// axios.get('https://raw.githubusercontent.com/fernandoggaitan/vuejs_axios/master/response.json')
+	axios.get('https://httpbin.org/get')
+			.then(function (response) {
+		console.log('peposo');
+		console.log(response);
+	});
+
+	function getSimpleModeData(){
+		var endpoint = BASE_URL + '/simpleMode';
+
+		axios.get(SIMPLE_MODE_ENDPOINT)
+			.then(function (response) {
+				if (response.is_success == true){
+					console.log(response);
+
+
+				}
+			});
+	}
+
+	// fetch data to fill the view
+	function initView(){
+		var endpoint = BASE_URL + '/init';
+
+		axios.get(SIMPLE_MODE_ENDPOINT)
+				.then(function (response) {
+					if (response.is_success == true){
+						console.log(response);
+					}
+				});
+	}
+
+
+	var ctx = document.getElementById("myChart").getContext("2d");
+	var temperatureChart = new Chart(ctx, {
+		type: 'line',
+		data: {
+			datasets: [{
+				label: 'Temperaturas Seteadas',
+				steppedLine: true,
+				backgroundColor:'rgb(0,128,255,0.1)',
+				data: [{
+					x: 0,
+					y: 18
+				}, {
+					x: 12,
+					y: 20
+				}, {
+					x: 24,
+					y: 22
+				}],
+			},{
+				label: 'Temperaturas transcurridas',
+				steppedLine: true,
+				backgroundColor:'rgb(255,0,0,0.1)',
+				data: [],
+				},
 			]
-		}]
+		},
+		options: {
+			scales: {
+				xAxes: [
+					{
+						type: 'linear',
+						position: 'bottom',
+						ticks: {
+							beginAtZero: true,
+						}
+					}
+				],
+				yAxes: [
+					{
+						ticks: {
+							beginAtZero: true,
+						}
+					}
+				]
+			}
+		}
 	});
-	chart.render();	
-
-	var ctx = document.getElementById('chartjs').getContext('2d');
-
-	var myLineChart = new Chart(ctx, {
-    type: 'scatter',
-    data:{
-        datasets: [{
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: [{x:1,y:1},{x:3,y:3},{x:2,y:1}]
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                type: 'linear',
-                position: 'bottom'
-            }]
-        }
-    }
-	});
-
-	}) // document.ready
 
 </script>
+
+
+
+
+
+
+
