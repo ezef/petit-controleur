@@ -1,4 +1,5 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
@@ -15,6 +16,14 @@
 #define TEMPERATURE_PRECISION 9
 #define HISTERESIS 0.3
 
+#ifndef STASSID
+#define STASSID "THESSID"
+#define STAPSK  "THEPASSWORD"
+#endif
+
+const char* ssid     = STASSID;
+const char* password = STAPSK;
+
 byte tempset1;
 byte relay1 = 0;
 
@@ -26,9 +35,6 @@ DallasTemperature sensors(&oneWire);
 Tempo t_temp(30*1000); // temporizador para la lectura de temperatura
 
 ESP8266WebServer server(80);
-IPAddress local_IP(192,168,1,1);
-IPAddress gateway(192,168,1,1);
-IPAddress subnet(255,255,255,0);
 
 String html_principal(){
 String estado="<span class=\"label label-danger\">Off</span>";
@@ -134,6 +140,7 @@ void setferm1(){
     tempset1= (byte)server.arg("tempset").toInt();
     EEPROM.put(ADDR1,tempset1);
     EEPROM.commit();
+    control();
     redirectHome();
   }else{
     returnFail("Temperatura seteada Vacia");
@@ -144,6 +151,45 @@ void bootstrap()
   File file = SPIFFS.open("/bootstrap.min.css.gz", "r"); 
   size_t sent = server.streamFile(file, "text/css");
 }
+void apiPostData(int temperature){
+  if(WiFi.status()== WL_CONNECTED){
+    
+    Serial.println("API posting data: ");
+    Serial.print("    Temp sensada:");
+    Serial.println(temperature);
+    Serial.print("    Temp seteada:");
+    Serial.println(tempset1);
+    
+    HTTPClient http;
+    
+    String serverPath = "http://control.ezefsoftware.com.ar/?"; // 167.71.59.68
+    serverPath += "tempsens=";
+    serverPath += temperature;
+    serverPath += "&tempset=";
+    serverPath += tempset1;
+    
+    Serial.println(serverPath);
+
+    http.begin(serverPath.c_str());
+    http.addHeader("Host", "control.ezefsoftware.com.ar");
+
+    int httpResponseCode = http.POST("");
+    
+    if (httpResponseCode>0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      //String payload = http.getString();
+      //Serial.println(payload);
+    } else {
+      Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
+    }
+    
+    http.end();
+  } else {
+    Serial.println("WIFI not connected");
+  }
+  
+}
 
 void setup(void)
 {
@@ -153,9 +199,10 @@ void setup(void)
   delay(10);
   sensors.begin();
   delay(10);
-  WiFi.softAPConfig(local_IP, gateway, subnet);
-  delay(10);
-  WiFi.softAP("Mason");
+  
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid,password);
+  
   delay(10);
   Serial.println("");
 
@@ -185,6 +232,7 @@ void getTemps(){
 
 void control(){
   getTemps();
+  apiPostData(tempsensada1);
   
   if (tempsensada1 > tempset1 + HISTERESIS){
     digitalWrite(RELAY1, LOW);
