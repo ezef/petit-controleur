@@ -36,6 +36,25 @@ Tempo t_temp(30*1000); // temporizador para la lectura de temperatura
 Tempo tempo_wifi_retry(60*1000); // resilient connection retry to WIFI each minute
 ESP8266WebServer server(80);
 
+String html_login(){
+return "<!DOCTYPE HTML>"
+"<html>"
+"<head>"
+"<title>Mason</title>"
+"</head>"
+"<body>"
+"  <FORM action=\"/\" method=\"post\">"
+"    <P>"
+"      Login: "
+"      <INPUT type=\"text\" name=\"password\">  "    
+"      <INPUT type=\"submit\" value=\"Enviar\">"
+"      <br/>"
+"    </P>"
+"  </FORM>"  
+"</body>"
+"</html>";
+}
+
 String html_principal(){
 String estado="<span class=\"label label-danger\">Off</span>";
 
@@ -82,7 +101,12 @@ return ret;
 
 void handleRoot()
 {
-    server.send(200, "text/html", html_principal());
+  if (server.hasArg("password")) {
+    handleSubmit();
+  }
+  else {
+    server.send(200, "text/html", html_login());
+  }
 }
 
 void returnFail(String msg)
@@ -94,8 +118,7 @@ void returnFail(String msg)
 
 void redirectHome()
 {
-  server.sendHeader("Location", "/",true); 
-  server.send(302, "text/plain",""); 
+  server.send(200, "text/html", html_principal()); 
 }
 
 void handleSubmit()
