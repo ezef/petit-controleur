@@ -33,7 +33,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 Tempo t_temp(30*1000); // temporizador para la lectura de temperatura
-
+Tempo tempo_wifi_retry(60*1000); // resilient connection retry to WIFI each minute
 ESP8266WebServer server(80);
 
 String html_principal(){
@@ -190,22 +190,20 @@ void apiPostData(int temperature){
   }
   
 }
+void initWIFI()
+{
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid,password);
+}
 
 void setup(void)
 {
-  Serial.begin(115200);
-  delay(10);
-  EEPROM.begin(512);
-  delay(10);
-  sensors.begin();
-  delay(10);
+  Serial.begin(115200); delay(10);
+  EEPROM.begin(512); delay(10);
+  sensors.begin(); delay(10);
   
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid,password);
+  initWIFI(); delay(10);
   
-  delay(10);
-  Serial.println("");
-
   server.on("/", handleRoot);
   server.on("/ferm1", setferm1);
   server.on("/bootstrap.min.css", bootstrap);
@@ -251,7 +249,12 @@ void control(){
 
 void loop(void)
 {
+  // Resilient connection to WIFI
+  if (WiFi.status() != WL_CONNECTED && tempo_wifi_retry.state()){
+    initWIFI();
+  }
   server.handleClient();
+  
   if (t_temp.state()){ // realiza la lectura de la temperatura, actualiza el lcd y comanda los relays.
     control();
   }  
