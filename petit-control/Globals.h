@@ -31,11 +31,6 @@
     #define TEMPERATURE_PRECISION 9
     #define HISTERESIS 0.3
 
-    #ifndef STASSID
-    #define STASSID "THESSID"
-    #define STAPSK  "THEPASSWORD"
-    #endif
-
     extern const char* ssid;
     extern const char* password;
 
