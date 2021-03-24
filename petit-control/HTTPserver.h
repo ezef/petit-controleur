@@ -9,7 +9,8 @@
     void handleNotFound();
     void returnFail(String msg);
     void handleRoot();
-    void handleSetFermSubmit();
+    void handleSetSimpleModeSubmit();
+    void handleSteppedModeSubmit();
     
 
 #endif

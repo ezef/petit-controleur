@@ -1,9 +1,4 @@
 
-
-
-
-
-
 #include "StepTemperatureFunctions.h"
 #include "HTML.h"
 #include "TemperatureControlFunctions.h"
@@ -26,11 +21,15 @@ void setup(void)
   
   initWIFI(); delay(10);  
   initHTTPserver(); delay(10);
-  SPIFFS.begin(); 
+  SPIFFS.begin(); delay(10);
 
   tempset1 = EEPROM.read(ADDR1);
-
   getTemps();
+
+  temperatureControlMode = EEPROM.read(EEPROM_ADDR_ACTIVE_MODE);
+  if (temperatureControlMode == STEPPED_MODE){
+     hoursPassedSinceSteppedControlModeStarted = readElapsedHoursFromEEPROM();
+  }
 
   Serial.print(" Sensor1: ");
   Serial.print(tempsensada1);
@@ -39,16 +38,21 @@ void setup(void)
   digitalWrite(RELAY1,HIGH);
 }
 
-
 void loop(void)
 {
   // Resilient connection to WIFI
   if (WiFi.status() != WL_CONNECTED && tempo_wifi_retry.state()){
     initWIFI();
   }
+
   server.handleClient();
-  
-  if (t_temp.state()){ // realiza la lectura de la temperatura, actualiza el lcd y comanda los relays.
+
+  if (tempo_step_change.state() && temperatureControlMode == STEPPED_MODE ){
+    updateElapsedHours();
+    evaluateTemperatureChange();
+  } 
+
+  if (t_temp.state()){ 
     control();
   }  
 }

@@ -40,7 +40,7 @@ String ret="<html><head>"
 " </div>"
 " <div class=\"row\">"
 "   <div class=\"col-md-6 \">"
-"     <form action=\"/ferm1\" method=\"post\">"
+"     <form action=\"/simple_mode\" method=\"post\">"
 "       <div class=\"form-group\">"
 "           <label for=\"sarasa\">Temp heladera: <span class=\"label label-primary\"> ";
 ret += tempsensada1;
