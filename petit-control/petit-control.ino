@@ -8,96 +8,11 @@
 #include <tempo.h>
 #include <FS.h>
 
-#define ADDR1 0 //direccion de la EEPROM para la tempSet1
-
-#define RELAY1 5 
-
-#define ONE_WIRE_BUS 14
-#define TEMPERATURE_PRECISION 9
-#define HISTERESIS 0.3
-
-#ifndef STASSID
-#define STASSID "THESSID"
-#define STAPSK  "THEPASSWORD"
-#endif
-
-const char* ssid     = STASSID;
-const char* password = STAPSK;
-
-byte tempset1;
-byte relay1 = 0;
-
-float tempsensada1;
-
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensors(&oneWire);
-
-Tempo t_temp(30*1000); // temporizador para la lectura de temperatura
-Tempo tempo_wifi_retry(60*1000); // resilient connection retry to WIFI each minute
-ESP8266WebServer server(80);
-
-String html_login(){
-return "<!DOCTYPE HTML>"
-"<html>"
-"<head>"
-"<title>Mason</title>"
-"</head>"
-"<body>"
-"  <FORM action=\"/\" method=\"post\">"
-"    <P>"
-"      Login: "
-"      <INPUT type=\"text\" name=\"password\">  "    
-"      <INPUT type=\"submit\" value=\"Enviar\">"
-"      <br/>"
-"    </P>"
-"  </FORM>"  
-"</body>"
-"</html>";
-}
-
-String html_principal(){
-String estado="<span class=\"label label-danger\">Off</span>";
-
-if (relay1){
-  estado="<span class=\"label label-success\">On</span>";
-}
-  
-String ret="<html><head>"
-"    <title>Control Masonico</title>"
-" <meta charset=\"utf-8\"> "
-" <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
-" <link rel=\"stylesheet\" href=\"bootstrap.min.css\">"
-"</head>"
-""
-"<body>"
-"<div class=\"container-fluid\">"
-" <div class=\"well\">"
-"    <h1>Control Masonico</h1>"
-" </div>"
-" <div class=\"row\">"
-"   <div class=\"col-md-6 \">"
-"     <form action=\"/ferm1\" method=\"post\">"
-"       <div class=\"form-group\">"
-"           <label for=\"sarasa\">Temp heladera: <span class=\"label label-primary\"> ";
-ret += tempsensada1;
-ret+= "°</span></label>"
-"           <span class=\"label label-default\">Set: ";
-ret += tempset1;
-ret+= "°</span>";
-ret+= estado;
-ret+="           <input type=\"number\" class=\"form-control\" name=\"tempset\" autocomplete=\"off\">"
-"       </div>"
-"       <div class=\"form-group\">"
-"         <input type=\"submit\" class=\"btn btn-default\" value=\"Enviar\"> "
-"       </div>"
-"     </form>"
-"   </div>"
-" </div>"
-"</div>"
-"</body>"
-"</html>";
-return ret;
-}
+#include "StepTemperatureFunctions.h"
+#include "HTML.h"
+#include "TemperatureControlFunctions.h"
+#include "Globals.h"
+#include "ApiFunctions.h"
 
 void handleRoot()
 {
@@ -169,50 +84,8 @@ void setferm1(){
     returnFail("Temperatura seteada Vacia");
   }  
 }
-void bootstrap()
-{
-  File file = SPIFFS.open("/bootstrap.min.css.gz", "r"); 
-  size_t sent = server.streamFile(file, "text/css");
-}
-void apiPostData(int temperature){
-  if(WiFi.status()== WL_CONNECTED){
-    
-    Serial.println("API posting data: ");
-    Serial.print("    Temp sensada:");
-    Serial.println(temperature);
-    Serial.print("    Temp seteada:");
-    Serial.println(tempset1);
-    
-    HTTPClient http;
-    
-    String serverPath = "http://control.ezefsoftware.com.ar/?"; // 167.71.59.68
-    serverPath += "tempsens=";
-    serverPath += temperature;
-    serverPath += "&tempset=";
-    serverPath += tempset1;
-    
-    Serial.println(serverPath);
 
-    http.begin(serverPath.c_str());
-    http.addHeader("Host", "control.ezefsoftware.com.ar");
 
-    int httpResponseCode = http.POST("");
-    
-    if (httpResponseCode>0) {
-      Serial.print("HTTP Response code: ");
-      Serial.println(httpResponseCode);
-      //String payload = http.getString();
-      //Serial.println(payload);
-    } else {
-      Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
-    }
-    
-    http.end();
-  } else {
-    Serial.println("WIFI not connected");
-  }
-  
-}
 void initWIFI()
 {
   WiFi.mode(WIFI_STA);
@@ -236,7 +109,7 @@ void setup(void)
 
   SPIFFS.begin(); 
 
-  tempset1= EEPROM.read(ADDR1);
+  tempset1 = EEPROM.read(ADDR1);
 
   getTemps();
 
@@ -246,29 +119,7 @@ void setup(void)
   pinMode(RELAY1, OUTPUT);
   digitalWrite(RELAY1,HIGH);
 }
-void getTemps(){
-  sensors.requestTemperatures();
-  tempsensada1= sensors.getTempCByIndex(0);
-}
 
-void control(){
-  getTemps();
-  apiPostData(tempsensada1);
-  
-  if (tempsensada1 > tempset1 + HISTERESIS){
-    digitalWrite(RELAY1, LOW);
-    Serial.print("Relay 1 ON - T1:");
-    Serial.println(tempsensada1);
-    relay1=true;
-  }else{
-    if (tempsensada1 < tempset1 - HISTERESIS){
-      digitalWrite(RELAY1,HIGH);
-      Serial.print("Relay 1 OFF- T1:");
-      Serial.println(tempsensada1);
-      relay1=false;
-    }
-  } 
-}
 
 void loop(void)
 {

@@ -1,0 +1,2 @@
+void getTemps();
+void control();
