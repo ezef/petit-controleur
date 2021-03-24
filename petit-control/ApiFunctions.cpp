@@ -1,8 +1,4 @@
-#include <Arduino.h>
-#include <WiFiClient.h>
-#include <ESP8266WiFi.h>
 #include "ApiFunctions.h"
-#include "Globals.h"
 
 void apiPostData(int temperature){
   if(WiFi.status()== WL_CONNECTED){

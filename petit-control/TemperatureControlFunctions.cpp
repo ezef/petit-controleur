@@ -1,6 +1,4 @@
 #include "TemperatureControlFunctions.h"
-#include "Globals.h"
-#include "ApiFunctions.h"
 
 void getTemps(){
   sensors.requestTemperatures();
@@ -24,5 +22,12 @@ void control(){
       relay1=false;
     }
   } 
+}
+
+void setferm1(int new_temp){
+  tempset1 = (byte )new_temp;
+  EEPROM.put(ADDR1,tempset1);
+  EEPROM.commit();
+  control();
 }
 

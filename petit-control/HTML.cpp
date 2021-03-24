@@ -1,6 +1,4 @@
 #include "HTML.h"
-#include "Globals.h"
-#include <FS.h>
 
 String html_login(){
     return "<!DOCTYPE HTML>"

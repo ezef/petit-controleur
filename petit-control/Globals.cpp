@@ -1,7 +1,4 @@
-#include <Arduino.h>
-#include <OneWire.h>
 #include "Globals.h"
-
 
 byte relay1 = 0;
 float tempsensada1;
