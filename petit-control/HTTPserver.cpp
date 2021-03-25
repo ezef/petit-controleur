@@ -63,12 +63,6 @@ void handleSubmit(){
   }
 }
 
-void returnOK(){
-  server.sendHeader("Connection", "close");
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.send(200, "text/plain", "OK\r\n");
-}
-
 void handleNotFound(){
   String message = "File Not Found\n\n";
   message += "URI: ";
