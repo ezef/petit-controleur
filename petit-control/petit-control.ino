@@ -1,5 +1,4 @@
 
-#include "StepTemperatureFunctions.h"
 #include "HTML.h"
 #include "TemperatureControlFunctions.h"
 #include "Globals.h"
@@ -7,14 +6,12 @@
 #include "HTTPserver.h"
 
 
-void initWIFI()
-{
+void initWIFI() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid,password);
 }
 
-void setup(void)
-{
+void setup(void) {
   Serial.begin(115200); delay(10);
   EEPROM.begin(512); delay(10);
   sensors.begin(); delay(10);
@@ -38,8 +35,7 @@ void setup(void)
   digitalWrite(RELAY1,HIGH);
 }
 
-void loop(void)
-{
+void loop(void) {
   // Resilient connection to WIFI
   if (WiFi.status() != WL_CONNECTED && tempo_wifi_retry.state()){
     initWIFI();
