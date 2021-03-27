@@ -17,7 +17,8 @@
   void control();
   void setTemperatureControlMode(int mode);
   void startSimpleModeTemperatureControl(int new_temperature);
-  void startSteppedModeTemperatureControl(TempStep submittedTempSteps[10]);
+  void saveSteppedModeTemperatureControl(TempStep submittedTempSteps[10]);
+  void startSteppedModeTemperatureControl();
   void updateElapsedHours();
   void evaluateTemperatureChange();
   int readElapsedHoursFromEEPROM();

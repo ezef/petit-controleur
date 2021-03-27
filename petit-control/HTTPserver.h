@@ -10,6 +10,7 @@
     void handleRoot();
     void handleSetSimpleModeSubmit();
     void handleSteppedModeSubmit();
+    void handleInitSteppedMode();
     
 
 #endif

@@ -41,7 +41,7 @@ void startSimpleModeTemperatureControl(int new_temperature){
   setFerm1(new_temperature);
 }
 
-void startSteppedModeTemperatureControl(TempStep submittedTempSteps[10]) {
+void saveSteppedModeTemperatureControl(TempStep submittedTempSteps[10]) {
 
   // Calculate accumulated hours for each temp step
   submittedTempSteps[0].starts_at = 0;
@@ -99,12 +99,17 @@ void startSteppedModeTemperatureControl(TempStep submittedTempSteps[10]) {
 
   // Set values on global variable (point global to submittedTempSteps)
   *temperatureSteps = submittedTempSteps;
+}
 
+void startSteppedModeTemperatureControl(){
   // change control mode
   setTemperatureControlMode(STEPPED_MODE);
 
   // set hour counter to 0
   hoursPassedSinceSteppedControlModeStarted = 0;
+
+  // change setted temp based on steps
+  evaluateTemperatureChange();
 }
 
 void setTemperatureControlMode(int mode){

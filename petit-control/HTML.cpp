@@ -20,6 +20,7 @@ String html_login(){
 }
 
 // TODO this should be removed once html_control proves it's working nice
+/**
 String html_principal(){
 String estado="<span class=\"label label-danger\">Off</span>";
 
@@ -65,6 +66,7 @@ ret += "</div>"
 
 return ret;
 }
+*/
 
 String html_control(){
 String full_html = R"=====(
@@ -158,7 +160,7 @@ String full_html = R"=====(
               <!-- <span class="label label-warning pull-right">Desactivado</span> -->
             </div>
             <div class="panel-body">
-              <form action="/stepped_mode" method="POST">
+              <form action="/save_stepped_mode" method="POST">
                 <table class="table" width="100%">
                   <thead>
                     <th>Escalon</th>

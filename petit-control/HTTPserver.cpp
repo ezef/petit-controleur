@@ -7,7 +7,8 @@
 void initHTTPserver(){
   server.on("/", handleRoot);
   server.on("/simple_mode", handleSetSimpleModeSubmit);
-  server.on("/stepped_mode", handleSteppedModeSubmit);
+  server.on("/save_stepped_mode", handleSteppedModeSubmit);
+  server.on("/init-stepped-mode", handleInitSteppedMode);
 
   server.on("/bootstrap.min.css", bootstrap);
   server.on("bootstrap.min.css", bootstrap);
@@ -33,6 +34,11 @@ void handleSetSimpleModeSubmit(){
   }
 }
 
+void handleInitSteppedMode(){
+  startSteppedModeTemperatureControl();
+  redirectHome();
+}
+
 void handleSteppedModeSubmit(){
 
   // TODO validate all of this first, do not store empty values
@@ -48,7 +54,7 @@ void handleSteppedModeSubmit(){
   submittedTempSteps[8] = {(byte) server.arg('step_9_temperature').toInt(), (byte) server.arg('step_9_hours').toInt() };
   submittedTempSteps[9] = {(byte) server.arg('step_10_temperature').toInt(), (byte) server.arg('step_10_hours').toInt() };
 
-  startSteppedModeTemperatureControl(submittedTempSteps);
+  saveSteppedModeTemperatureControl(submittedTempSteps);
 }
 
 void handleSubmit(){
