@@ -81,11 +81,14 @@
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
           <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-heading clearfix">
               Modo escalonado <span class="hidden-xs">(Temperatura escalonada segun parametros)</span>
               {{stepped_mode_active_indicator}}
               <!-- <span class="label label-success pull-right">Activado</span> -->
               <!-- <span class="label label-warning pull-right">Desactivado</span> -->
+              {{time_since_stepped_mode_started_html}}
+              <!-- <br> -->
+              <!-- <span class="label label-success pull-right">Iniciado hace {{stepped_mode_days_started}} dias y {{stepped_mode_hours_started}} horas</span> -->
             </div>
             <div class="panel-body">
               <form action="/save_stepped_mode" method="POST">

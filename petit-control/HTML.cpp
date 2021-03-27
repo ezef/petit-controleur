@@ -153,11 +153,12 @@ String full_html = R"=====(
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
           <div class="panel panel-default">
-            <div class="panel-heading">
+            <div class="panel-heading clearfix">
               Modo escalonado <span class="hidden-xs">(Temperatura escalonada segun parametros)</span>
               {{stepped_mode_active_indicator}}
               <!-- <span class="label label-success pull-right">Activado</span> -->
               <!-- <span class="label label-warning pull-right">Desactivado</span> -->
+              {{time_since_stepped_mode_started_html}}
             </div>
             <div class="panel-body">
               <form action="/save_stepped_mode" method="POST">
@@ -383,6 +384,17 @@ String full_html = R"=====(
   // stepped_mode_active_indicator
   full_html.replace("{{stepped_mode_active_indicator}}", temperatureControlMode == STEPPED_MODE ? mode_indicator_on_html : mode_indicator_off_html );
 
+  // stepped_mode_days_started and stepped_mode_hours_started
+
+  const char * time_since_stepped_mode_started_html = "<br><span class='label label-success pull-right'>Iniciado hace {{stepped_mode_days_started}} dias y {{stepped_mode_hours_started}} horas</span>";
+  full_html.replace("{{time_since_stepped_mode_started_html}}", temperatureControlMode == STEPPED_MODE ? time_since_stepped_mode_started_html : "" );
+
+  if (temperatureControlMode == STEPPED_MODE){
+    int days_passed = hoursPassedSinceSteppedControlModeStarted / 24;
+    int hours_passed = hoursPassedSinceSteppedControlModeStarted - (days_passed * 24);
+    full_html.replace("{{stepped_mode_days_started}}", (const char *) &days_passed );
+    full_html.replace("{{stepped_mode_hours_started}}", (const char *) &hours_passed );
+  }
 
   full_html.replace("{{step_1_temperature}}", temperatureSteps[0]->temperature > 0 ? (const char*) temperatureSteps[0]->temperature : "0");
   full_html.replace("{{step_2_temperature}}", temperatureSteps[1]->temperature > 0 ? (const char*) temperatureSteps[1]->temperature : "0");
