@@ -8,3 +8,4 @@ String html_login();
 String html_principal();
 void bootstrap();
 String html_stepped_temperatures();
+String html_control();

@@ -17,7 +17,7 @@ void initHTTPserver(){
 }
 
 void redirectHome(){
-  server.send(200, "text/html", html_principal()); 
+  server.send(200, "text/html", html_control()); 
 }
 
 void handleSetSimpleModeSubmit(){
@@ -57,7 +57,7 @@ void handleSubmit(){
   if (!server.hasArg("password")) return returnFail("BAD ARGS");
   pass = server.arg("password");
   if (pass == "angela") {
-    server.send(200, "text/html", html_principal());
+    server.send(200, "text/html", html_control());
   }  else {
     returnFail("shupala");
   }
