@@ -18,7 +18,10 @@ void initHTTPserver(){
 }
 
 void redirectHome(){
-  server.send(200, "text/html", html_control()); 
+  // server.send(200, "text/html", html_control()); 
+
+  server.sendHeader("Location", String("/"), true);
+  server.send ( 302, "text/plain", "");
 }
 
 void handleSetSimpleModeSubmit(){
@@ -57,6 +60,7 @@ void handleSteppedModeSubmit(){
   saveSteppedModeTemperatureControl(submittedTempSteps);
 }
 
+/*
 void handleSubmit(){
   String pass;
 
@@ -68,6 +72,7 @@ void handleSubmit(){
     returnFail("shupala");
   }
 }
+*/
 
 void handleNotFound(){
   String message = "File Not Found\n\n";
@@ -91,10 +96,13 @@ void returnFail(String msg){
 }
 
 void handleRoot(){
+  server.send(200, "text/html", html_control());
+  /*
   if (server.hasArg("password")) {
     handleSubmit();
   }
   else {
     server.send(200, "text/html", html_login());
   }
+  */
 }

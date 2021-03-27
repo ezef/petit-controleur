@@ -4,7 +4,7 @@
 
     void initHTTPserver();
     void redirectHome();
-    void handleSubmit();
+    // void handleSubmit();
     void handleNotFound();
     void returnFail(String msg);
     void handleRoot();
