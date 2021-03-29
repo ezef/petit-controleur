@@ -26,6 +26,7 @@ void setup(void) {
   temperatureControlMode = EEPROM.read(EEPROM_ADDR_ACTIVE_MODE);
   if (temperatureControlMode == STEPPED_MODE){
      hoursPassedSinceSteppedControlModeStarted = readElapsedHoursFromEEPROM();
+     loadSteppedTemperaturesFromEEPROM();
   }
 
   Serial.print(" Sensor1: ");

@@ -22,4 +22,5 @@
   void updateElapsedHours();
   void evaluateTemperatureChange();
   int readElapsedHoursFromEEPROM();
+  void loadSteppedTemperaturesFromEEPROM();
 #endif

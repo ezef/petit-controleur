@@ -58,43 +58,33 @@ void saveSteppedModeTemperatureControl(TempStep submittedTempSteps[10]) {
   // Store values on EEPROM
   EEPROM.put(EEPROM_ADDR_TEMP1_VALUE,submittedTempSteps[0].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP1_HOURS,submittedTempSteps[0].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP1_ACCUMULATED_HOURS,submittedTempSteps[0].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP2_VALUE,submittedTempSteps[1].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP2_HOURS,submittedTempSteps[1].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP2_ACCUMULATED_HOURS,submittedTempSteps[1].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP3_VALUE,submittedTempSteps[2].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP3_HOURS,submittedTempSteps[2].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP3_ACCUMULATED_HOURS,submittedTempSteps[2].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP4_VALUE,submittedTempSteps[3].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP4_HOURS,submittedTempSteps[3].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP4_ACCUMULATED_HOURS,submittedTempSteps[3].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP5_VALUE,submittedTempSteps[4].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP5_HOURS,submittedTempSteps[4].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP5_ACCUMULATED_HOURS,submittedTempSteps[4].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP6_VALUE,submittedTempSteps[5].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP6_HOURS,submittedTempSteps[5].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP6_ACCUMULATED_HOURS,submittedTempSteps[5].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP7_VALUE,submittedTempSteps[6].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP7_HOURS,submittedTempSteps[6].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP7_ACCUMULATED_HOURS,submittedTempSteps[6].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP8_VALUE,submittedTempSteps[7].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP8_HOURS,submittedTempSteps[7].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP8_ACCUMULATED_HOURS,submittedTempSteps[7].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP9_VALUE,submittedTempSteps[8].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP9_HOURS,submittedTempSteps[8].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP9_ACCUMULATED_HOURS,submittedTempSteps[8].starts_at);
 
   EEPROM.put(EEPROM_ADDR_TEMP10_VALUE,submittedTempSteps[9].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP10_HOURS,submittedTempSteps[9].hours);
-  EEPROM.put(EEPROM_ADDR_TEMP10_ACCUMULATED_HOURS,submittedTempSteps[9].starts_at);
   EEPROM.commit();
 
   // Set values on global variable (point global to submittedTempSteps)
@@ -159,5 +149,48 @@ int readElapsedHoursFromEEPROM(){
   byte days_passed = EEPROM.read(EEPROM_ADDR_DAYS_PASSED);
 
   return (days_passed * 24) + hours_passed;
+}
+
+void loadSteppedTemperaturesFromEEPROM(){
+
+  temperatureSteps[0]->temperature = EEPROM.read(EEPROM_ADDR_TEMP1_VALUE);
+  temperatureSteps[0]->hours = EEPROM.read(EEPROM_ADDR_TEMP1_VALUE);
+  temperatureSteps[0]->starts_at = 0;
+
+  temperatureSteps[1]->temperature = EEPROM.read(EEPROM_ADDR_TEMP2_VALUE);
+  temperatureSteps[1]->hours = EEPROM.read(EEPROM_ADDR_TEMP2_VALUE);
+  temperatureSteps[1]->starts_at = temperatureSteps[0]->starts_at + temperatureSteps[1]->hours;
+
+  temperatureSteps[2]->temperature = EEPROM.read(EEPROM_ADDR_TEMP3_VALUE);
+  temperatureSteps[2]->hours = EEPROM.read(EEPROM_ADDR_TEMP3_VALUE);
+  temperatureSteps[2]->starts_at = temperatureSteps[1]->starts_at + temperatureSteps[2]->hours;
+
+  temperatureSteps[3]->temperature = EEPROM.read(EEPROM_ADDR_TEMP4_VALUE);
+  temperatureSteps[3]->hours = EEPROM.read(EEPROM_ADDR_TEMP4_VALUE);
+  temperatureSteps[3]->starts_at = temperatureSteps[2]->starts_at + temperatureSteps[3]->hours;
+
+  temperatureSteps[4]->temperature = EEPROM.read(EEPROM_ADDR_TEMP5_VALUE);
+  temperatureSteps[4]->hours = EEPROM.read(EEPROM_ADDR_TEMP5_VALUE);
+  temperatureSteps[4]->starts_at = temperatureSteps[3]->starts_at + temperatureSteps[4]->hours;
+
+  temperatureSteps[5]->temperature = EEPROM.read(EEPROM_ADDR_TEMP6_VALUE);
+  temperatureSteps[5]->hours = EEPROM.read(EEPROM_ADDR_TEMP6_VALUE);
+  temperatureSteps[5]->starts_at = temperatureSteps[4]->starts_at + temperatureSteps[5]->hours;
+
+  temperatureSteps[6]->temperature = EEPROM.read(EEPROM_ADDR_TEMP7_VALUE);
+  temperatureSteps[6]->hours = EEPROM.read(EEPROM_ADDR_TEMP7_VALUE);
+  temperatureSteps[6]->starts_at = temperatureSteps[5]->starts_at + temperatureSteps[6]->hours;
+
+  temperatureSteps[7]->temperature = EEPROM.read(EEPROM_ADDR_TEMP8_VALUE);
+  temperatureSteps[7]->hours = EEPROM.read(EEPROM_ADDR_TEMP8_VALUE);
+  temperatureSteps[7]->starts_at = temperatureSteps[6]->starts_at + temperatureSteps[7]->hours;
+
+  temperatureSteps[8]->temperature = EEPROM.read(EEPROM_ADDR_TEMP9_VALUE);
+  temperatureSteps[8]->hours = EEPROM.read(EEPROM_ADDR_TEMP9_VALUE);
+  temperatureSteps[8]->starts_at = temperatureSteps[7]->starts_at + temperatureSteps[8]->hours;
+
+  temperatureSteps[9]->temperature = EEPROM.read(EEPROM_ADDR_TEMP10_VALUE);
+  temperatureSteps[9]->hours = EEPROM.read(EEPROM_ADDR_TEMP10_VALUE);
+  temperatureSteps[9]->starts_at = temperatureSteps[8]->starts_at + temperatureSteps[9]->hours;
 }
 
