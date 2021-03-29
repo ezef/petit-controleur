@@ -44,18 +44,40 @@ void handleInitSteppedMode(){
 
 void handleSteppedModeSubmit(){
 
-  // TODO validate all of this first, do not store empty values
+  int i = 0;
+  String temp_input_names[] = {
+    "step_1_temperature",
+    "step_2_temperature",
+    "step_3_temperature",
+    "step_4_temperature",
+    "step_5_temperature",
+    "step_6_temperature",
+    "step_7_temperature",
+    "step_8_temperature",
+    "step_9_temperature",
+    "step_10_temperature"
+  };
+
+  String times_input_names[] = {
+    "step_1_hours",
+    "step_2_hours",
+    "step_3_hours",
+    "step_4_hours",
+    "step_5_hours",
+    "step_6_hours",
+    "step_7_hours",
+    "step_8_hours",
+    "step_9_hours",
+    "step_10_hours"
+  };
   TempStep submittedTempSteps[10];
-  submittedTempSteps[0] = {(byte) server.arg('step_1_temperature').toInt(), (byte) server.arg('step_1_hours').toInt() }; // step_1_temperature should be the input field name in the
-  submittedTempSteps[1] = {(byte) server.arg('step_2_temperature').toInt(), (byte) server.arg('step_2_hours').toInt() };
-  submittedTempSteps[2] = {(byte) server.arg('step_3_temperature').toInt(), (byte) server.arg('step_3_hours').toInt() };
-  submittedTempSteps[3] = {(byte) server.arg('step_4_temperature').toInt(), (byte) server.arg('step_4_hours').toInt() };
-  submittedTempSteps[4] = {(byte) server.arg('step_5_temperature').toInt(), (byte) server.arg('step_5_hours').toInt() };
-  submittedTempSteps[5] = {(byte) server.arg('step_6_temperature').toInt(), (byte) server.arg('step_6_hours').toInt() };
-  submittedTempSteps[6] = {(byte) server.arg('step_7_temperature').toInt(), (byte) server.arg('step_7_hours').toInt() };
-  submittedTempSteps[7] = {(byte) server.arg('step_8_temperature').toInt(), (byte) server.arg('step_8_hours').toInt() };
-  submittedTempSteps[8] = {(byte) server.arg('step_9_temperature').toInt(), (byte) server.arg('step_9_hours').toInt() };
-  submittedTempSteps[9] = {(byte) server.arg('step_10_temperature').toInt(), (byte) server.arg('step_10_hours').toInt() };
+
+  for (int j=0; j <= 9; j++){
+    if(server.arg(temp_input_names[j]).toInt() > 0 && server.arg(times_input_names[j]).toInt() > 0){
+      submittedTempSteps[i] = {(byte) server.arg(temp_input_names[j]).toInt(), (byte) server.arg(times_input_names[j]).toInt() }; // step_1_temperature should be the input field name in the
+      i++;
+    }
+  }
 
   saveSteppedModeTemperatureControl(submittedTempSteps);
 }

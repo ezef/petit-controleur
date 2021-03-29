@@ -134,6 +134,7 @@ void evaluateTemperatureChange(){
     // Determine in which step we are
     for (byte i = 0; i < 9; ){
       // if the accumulated time is greather that the calulated time for this step but we have the previous step temperature activated. move to the next step
+      // TODO add check for temperature = 0, wich means do not change temperatures.
       if (hoursPassedSinceSteppedControlModeStarted >= temperatureSteps[i+1]->starts_at && tempset1 == temperatureSteps[i]->temperature){
         setFerm1((int) temperatureSteps[i+1]->temperature);
         break;
