@@ -73,10 +73,10 @@ void handleSteppedModeSubmit(){
   TempStep submittedTempSteps[10];
 
   for (int j=0; j <= 9; j++){
-    if(server.arg(temp_input_names[j]).toInt() > 0 && server.arg(times_input_names[j]).toInt() > 0){
+    // if(server.arg(temp_input_names[j]).toInt() > 0 && server.arg(times_input_names[j]).toInt() > 0){
       submittedTempSteps[i] = {(byte) server.arg(temp_input_names[j]).toInt(), (byte) server.arg(times_input_names[j]).toInt() }; // step_1_temperature should be the input field name in the
       i++;
-    }
+    // }
   }
 
   saveSteppedModeTemperatureControl(submittedTempSteps);
