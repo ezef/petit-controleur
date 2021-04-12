@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include <FS.h>
 #include "TemperatureControlFunctions.h"
+#include "debug.h"
 
 
 String html_login();

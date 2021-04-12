@@ -1,4 +1,5 @@
 #include "HTML.h"
+#include "Globals.h"
 
 String html_login(){
     return "<!DOCTYPE HTML>"
@@ -197,7 +198,7 @@ String full_html = R"=====(
                       </td>
                       <td>
                         <div class="input-group">
-                          <input type="number" name="step_2_hours" class="form-control" value="{{step_2_temperature}}"min="0">
+                          <input type="number" name="step_2_hours" class="form-control" value="{{step_2_hours}}"min="0">
                           <span class="input-group-addon">Hs</span>
                         </div>
                       </td>
@@ -364,10 +365,10 @@ String full_html = R"=====(
 )=====";
 
   // temperature_read
-  full_html.replace("{{temperature_read}}", (const char *) &tempsensada1);
+  full_html.replace("{{temperature_read}}", String(tempsensada1));
 
   // current_set_indicator
-  full_html.replace("{{current_set_indicator}}", (const char *) &tempset1);
+  full_html.replace("{{current_set_indicator}}", String(tempset1));
 
   // actuator_indicator
   const char * actuator_on_html = "<span class='label label-success label-indicator'>On</span>";
@@ -392,31 +393,31 @@ String full_html = R"=====(
   if (temperatureControlMode == STEPPED_MODE){
     int days_passed = hoursPassedSinceSteppedControlModeStarted / 24;
     int hours_passed = hoursPassedSinceSteppedControlModeStarted - (days_passed * 24);
-    full_html.replace("{{stepped_mode_days_started}}", (const char *) &days_passed );
-    full_html.replace("{{stepped_mode_hours_started}}", (const char *) &hours_passed );
+    full_html.replace("{{stepped_mode_days_started}}", String(days_passed) );
+    full_html.replace("{{stepped_mode_hours_started}}", String(hours_passed) );
   }
 
-  full_html.replace("{{step_1_temperature}}", temperatureSteps[0]->temperature > 0 ? (const char*) temperatureSteps[0]->temperature : "0");
-  full_html.replace("{{step_2_temperature}}", temperatureSteps[1]->temperature > 0 ? (const char*) temperatureSteps[1]->temperature : "0");
-  full_html.replace("{{step_3_temperature}}", temperatureSteps[2]->temperature > 0 ? (const char*) temperatureSteps[2]->temperature : "0");
-  full_html.replace("{{step_4_temperature}}", temperatureSteps[3]->temperature > 0 ? (const char*) temperatureSteps[3]->temperature : "0");
-  full_html.replace("{{step_5_temperature}}", temperatureSteps[4]->temperature > 0 ? (const char*) temperatureSteps[4]->temperature : "0");
-  full_html.replace("{{step_6_temperature}}", temperatureSteps[5]->temperature > 0 ? (const char*) temperatureSteps[5]->temperature : "0");
-  full_html.replace("{{step_7_temperature}}", temperatureSteps[6]->temperature > 0 ? (const char*) temperatureSteps[6]->temperature : "0");
-  full_html.replace("{{step_8_temperature}}", temperatureSteps[7]->temperature > 0 ? (const char*) temperatureSteps[7]->temperature : "0");
-  full_html.replace("{{step_9_temperature}}", temperatureSteps[8]->temperature > 0 ? (const char*) temperatureSteps[8]->temperature : "0");
-  full_html.replace("{{step_10_temperature}}", temperatureSteps[9]->temperature > 0 ? (const char*) temperatureSteps[9]->temperature : "0");
+  full_html.replace("{{step_1_temperature}}", temperatureSteps[0].temperature > 0 ? String(temperatureSteps[0].temperature) : "0");
+  full_html.replace("{{step_2_temperature}}", temperatureSteps[1].temperature > 0 ? String(temperatureSteps[1].temperature) : "0");
+  full_html.replace("{{step_3_temperature}}", temperatureSteps[2].temperature > 0 ? String(temperatureSteps[2].temperature) : "0");
+  full_html.replace("{{step_4_temperature}}", temperatureSteps[3].temperature > 0 ? String(temperatureSteps[3].temperature) : "0");
+  full_html.replace("{{step_5_temperature}}", temperatureSteps[4].temperature > 0 ? String(temperatureSteps[4].temperature) : "0");
+  full_html.replace("{{step_6_temperature}}", temperatureSteps[5].temperature > 0 ? String(temperatureSteps[5].temperature) : "0");
+  full_html.replace("{{step_7_temperature}}", temperatureSteps[6].temperature > 0 ? String(temperatureSteps[6].temperature) : "0");
+  full_html.replace("{{step_8_temperature}}", temperatureSteps[7].temperature > 0 ? String(temperatureSteps[7].temperature) : "0");
+  full_html.replace("{{step_9_temperature}}", temperatureSteps[8].temperature > 0 ? String(temperatureSteps[8].temperature) : "0");
+  full_html.replace("{{step_10_temperature}}", temperatureSteps[9].temperature > 0 ? String(temperatureSteps[9].temperature) : "0");
 
-  full_html.replace("{{step_1_hour}}", temperatureSteps[0]->temperature > 0 ? (const char*) temperatureSteps[0]->hours : "0");
-  full_html.replace("{{step_2_hour}}", temperatureSteps[1]->temperature > 0 ? (const char*) temperatureSteps[1]->hours : "0");
-  full_html.replace("{{step_3_hour}}", temperatureSteps[2]->temperature > 0 ? (const char*) temperatureSteps[2]->hours : "0");
-  full_html.replace("{{step_4_hour}}", temperatureSteps[3]->temperature > 0 ? (const char*) temperatureSteps[3]->hours : "0");
-  full_html.replace("{{step_5_hour}}", temperatureSteps[4]->temperature > 0 ? (const char*) temperatureSteps[4]->hours : "0");
-  full_html.replace("{{step_6_hour}}", temperatureSteps[5]->temperature > 0 ? (const char*) temperatureSteps[5]->hours : "0");
-  full_html.replace("{{step_7_hour}}", temperatureSteps[6]->temperature > 0 ? (const char*) temperatureSteps[6]->hours : "0");
-  full_html.replace("{{step_8_hour}}", temperatureSteps[7]->temperature > 0 ? (const char*) temperatureSteps[7]->hours : "0");
-  full_html.replace("{{step_9_hour}}", temperatureSteps[8]->temperature > 0 ? (const char*) temperatureSteps[8]->hours : "0");
-  full_html.replace("{{step_10_hours}}", temperatureSteps[9]->temperature > 0 ? (const char*) temperatureSteps[9]->hours : "0");
+  full_html.replace("{{step_1_hours}}", temperatureSteps[0].hours > 0 ? String(temperatureSteps[0].hours) : "0");
+  full_html.replace("{{step_2_hours}}", temperatureSteps[1].hours > 0 ? String(temperatureSteps[1].hours) : "0");
+  full_html.replace("{{step_3_hours}}", temperatureSteps[2].hours > 0 ? String(temperatureSteps[2].hours) : "0");
+  full_html.replace("{{step_4_hours}}", temperatureSteps[3].hours > 0 ? String(temperatureSteps[3].hours) : "0");
+  full_html.replace("{{step_5_hours}}", temperatureSteps[4].hours > 0 ? String(temperatureSteps[4].hours) : "0");
+  full_html.replace("{{step_6_hours}}", temperatureSteps[5].hours > 0 ? String(temperatureSteps[5].hours) : "0");
+  full_html.replace("{{step_7_hours}}", temperatureSteps[6].hours > 0 ? String(temperatureSteps[6].hours) : "0");
+  full_html.replace("{{step_8_hours}}", temperatureSteps[7].hours > 0 ? String(temperatureSteps[7].hours) : "0");
+  full_html.replace("{{step_9_hours}}", temperatureSteps[8].hours > 0 ? String(temperatureSteps[8].hours) : "0");
+  full_html.replace("{{step_10_hours}}", temperatureSteps[9].hours > 0 ? String(temperatureSteps[9].hours) : "0");
 
   return full_html;
 }

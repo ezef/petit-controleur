@@ -3,6 +3,7 @@
   #include <EEPROM.h>
   #include "Globals.h"
   #include "ApiFunctions.h"
+  #include "debug.h"
 
   struct TempStep {
     byte temperature;
@@ -10,7 +11,7 @@
     int starts_at; // calculated accumulated hours since control starts for this tempstep should start
   };
 
-  extern TempStep * temperatureSteps[10];
+  extern TempStep temperatureSteps[10];
 
   void setferm1(int new_temp);
   void getTemps();
