@@ -137,11 +137,12 @@ void evaluateTemperatureChange(){
   } else {
     // Determine in which step we are
     for (byte i = 0; i < 8;i++){
-      // if the accumulated time is greather that the calulated time for this step but we have the previous step temperature activated. move to the next step
-      // TODO add check for temperature = 0, wich means do not change temperatures.
-      if (hoursPassedSinceSteppedControlModeStarted >= temperatureSteps[i+1].starts_at && tempset1 == temperatureSteps[i].temperature){
-        setFerm1((int) temperatureSteps[i+1].temperature);
-        break;
+      if (temperatureSteps[i+1].temperature > 0 && temperatureSteps[i+1].hours > 0){
+        // if the accumulated time is greather that the calulated time for this step but we have the previous step temperature activated. move to the next step
+        if (hoursPassedSinceSteppedControlModeStarted >= temperatureSteps[i+1].starts_at && tempset1 == temperatureSteps[i].temperature){
+          setFerm1((int) temperatureSteps[i+1].temperature);
+          break;
+        }
       }
     }
   }
