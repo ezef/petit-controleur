@@ -103,6 +103,10 @@ void saveSteppedModeTemperatureControl(TempStep submittedTempSteps[10]) {
   EEPROM.put(EEPROM_ADDR_TEMP10_HOURS,temperatureSteps[9].hours);
   EEPROM.commit();
   debugTemperatureSteps();
+
+  if ( temperatureControlMode == STEPPED_MODE){
+    evaluateTemperatureChange();
+  }
 }
 
 void startSteppedModeTemperatureControl(){
@@ -132,8 +136,7 @@ void evaluateTemperatureChange(){
 
   if (hoursPassedSinceSteppedControlModeStarted == 0){
     // it has just started, use first temp
-    tempset1 = (int) temperatureSteps[0].temperature;
-    control();
+    setFerm1(temperatureSteps[0].temperature);
   } else {
     // Determine in which step we are
     for (byte i = 0; i < 8;i++){
