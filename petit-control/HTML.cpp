@@ -104,11 +104,13 @@ String full_html = R"=====(
               <span class="mr2">
                 Lectura: <span class="label label-primary label-indicator">{{temperature_read}}º</span>
               </span>
-  
+
+              <br class="visible-xs"><br class="visible-xs">
               <span class="mr2">
                 Set actual: <span class="label label-default label-indicator">{{current_set_indicator}}º</span>
               </span>
-  
+
+              <br class="visible-xs"><br class="visible-xs">
               <span class="">
                 Estado actuador:
                 {{actuator_indicator}}
@@ -162,6 +164,7 @@ String full_html = R"=====(
               {{time_since_stepped_mode_started_html}}
             </div>
             <div class="panel-body">
+              <button class="btn btn-clear-all btn-sm btn-default" onclick="clearAll()">Clear all</button>
               <form action="/save_stepped_mode" method="POST">
                 <table class="table" width="100%">
                   <thead>
@@ -360,6 +363,32 @@ String full_html = R"=====(
       <!-- End stepped mode -->
 
 		</div>
+
+      <script>
+        function clearAll(){
+          document.querySelector('input[name="step_1_temperature"]').value = 0;
+          document.querySelector('input[name="step_2_temperature"]').value = 0;
+          document.querySelector('input[name="step_3_temperature"]').value = 0;
+          document.querySelector('input[name="step_4_temperature"]').value = 0;
+          document.querySelector('input[name="step_5_temperature"]').value = 0;
+          document.querySelector('input[name="step_6_temperature"]').value = 0;
+          document.querySelector('input[name="step_7_temperature"]').value = 0;
+          document.querySelector('input[name="step_8_temperature"]').value = 0;
+          document.querySelector('input[name="step_9_temperature"]').value = 0;
+          document.querySelector('input[name="step_10_temperature"]').value = 0;
+
+          document.querySelector('input[name="step_1_hours"]').value = 0;
+          document.querySelector('input[name="step_2_hours"]').value = 0;
+          document.querySelector('input[name="step_3_hours"]').value = 0;
+          document.querySelector('input[name="step_4_hours"]').value = 0;
+          document.querySelector('input[name="step_5_hours"]').value = 0;
+          document.querySelector('input[name="step_6_hours"]').value = 0;
+          document.querySelector('input[name="step_7_hours"]').value = 0;
+          document.querySelector('input[name="step_8_hours"]').value = 0;
+          document.querySelector('input[name="step_9_hours"]').value = 0;
+          document.querySelector('input[name="step_10_hours"]').value = 0;
+        }
+    </script>
 	</body>
 </html>
 )=====";

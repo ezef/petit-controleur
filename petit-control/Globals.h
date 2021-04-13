@@ -26,7 +26,7 @@
     #define EEPROM_ADDR_DAYS_PASSED 2 // Dias transcurridos desde que se activo el modo Temp escalonadas
     #define EEPROM_ADDR_HOURS_PASSED 3 // Horas transcurridas desde que se activo el modo Temp escalonadas
 
-    #define EEPROM_ADDR_TEMP1_VALUE 4
+    #define EEPROM_ADDR_TEMP1_VALUE 24 // The EEPROM 4 position seems to be broken
     #define EEPROM_ADDR_TEMP1_HOURS 5
     #define EEPROM_ADDR_TEMP2_VALUE 6
     #define EEPROM_ADDR_TEMP2_HOURS 7

@@ -11,16 +11,16 @@ void apiPostData(int temperature){
     
     HTTPClient http;
     
-    String serverPath = "http://control.ezefsoftware.com.ar/?"; // 167.71.59.68
-    serverPath += "tempsens=";
+    String serverPath = "http://home.ezefsoftware.com.ar:8100/api/temperature?"; // 167.71.59.68
+    serverPath += "temperature_read=";
     serverPath += temperature;
-    serverPath += "&tempset=";
+    serverPath += "&temperature_set=";
     serverPath += tempset1;
     
     Serial.println(serverPath);
 
     http.begin(serverPath.c_str());
-    http.addHeader("Host", "control.ezefsoftware.com.ar");
+    // http.addHeader("Host", "home.ezefsoftware.com.ar");
 
     int httpResponseCode = http.POST("");
     

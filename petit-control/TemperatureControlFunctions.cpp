@@ -102,6 +102,7 @@ void saveSteppedModeTemperatureControl(TempStep submittedTempSteps[10]) {
   EEPROM.put(EEPROM_ADDR_TEMP10_VALUE,temperatureSteps[9].temperature);
   EEPROM.put(EEPROM_ADDR_TEMP10_HOURS,temperatureSteps[9].hours);
   EEPROM.commit();
+  debugTemperatureSteps();
 }
 
 void startSteppedModeTemperatureControl(){
@@ -135,7 +136,7 @@ void evaluateTemperatureChange(){
     control();
   } else {
     // Determine in which step we are
-    for (byte i = 0; i < 9; ){
+    for (byte i = 0; i < 8;i++){
       // if the accumulated time is greather that the calulated time for this step but we have the previous step temperature activated. move to the next step
       // TODO add check for temperature = 0, wich means do not change temperatures.
       if (hoursPassedSinceSteppedControlModeStarted >= temperatureSteps[i+1].starts_at && tempset1 == temperatureSteps[i].temperature){
@@ -204,6 +205,6 @@ void loadSteppedTemperaturesFromEEPROM(){
   temperatureSteps[9].temperature = EEPROM.read(EEPROM_ADDR_TEMP10_VALUE);
   temperatureSteps[9].hours = EEPROM.read(EEPROM_ADDR_TEMP10_HOURS);
   temperatureSteps[9].starts_at = temperatureSteps[8].starts_at + temperatureSteps[8].hours;
-  // debugTemperatureSteps();
+  debugTemperatureSteps();
 }
 

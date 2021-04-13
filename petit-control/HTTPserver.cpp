@@ -119,7 +119,6 @@ void returnFail(String msg){
 }
 
 void handleRoot(){
-
   server.send(200, "text/html", html_control());
   /*
   if (server.hasArg("password")) {
