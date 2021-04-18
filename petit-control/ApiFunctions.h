@@ -3,4 +3,4 @@
 #include <ESP8266WiFi.h>
 #include "Globals.h"
 
-void apiPostData(int temperature);
+void apiPostData(float temperature);

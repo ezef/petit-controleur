@@ -1,6 +1,6 @@
 #include "ApiFunctions.h"
 
-void apiPostData(int temperature){
+void apiPostData(float temperature){
   if(WiFi.status()== WL_CONNECTED){
     
     Serial.println("API posting data: ");
