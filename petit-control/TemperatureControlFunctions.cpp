@@ -116,8 +116,10 @@ void startSteppedModeTemperatureControl(){
   // set hour counter to 0
   hoursPassedSinceSteppedControlModeStarted = 0;
 
+  setCurrentTemperatureStep(0);
+
   // change setted temp based on steps
-  evaluateTemperatureChange();
+  evaluateTemperatureChange();  
 }
 
 void setTemperatureControlMode(int mode){
@@ -134,19 +136,14 @@ void setTemperatureControlMode(int mode){
 void evaluateTemperatureChange(){
   // Determine if we need to change the temperature based on the stored steps
 
-  if (hoursPassedSinceSteppedControlModeStarted == 0){
+  if (currentTemperatureStep == 0 && hoursPassedSinceSteppedControlModeStarted == 0){
     // it has just started, use first temp
     setFerm1(temperatureSteps[0].temperature);
-  } else {
-    // Determine in which step we are
-    for (byte i = 0; i < 8;i++){
-      if (temperatureSteps[i+1].temperature > 0 && temperatureSteps[i+1].hours > 0){
-        // if the accumulated time is greather that the calulated time for this step but we have the previous step temperature activated. move to the next step
-        if (hoursPassedSinceSteppedControlModeStarted >= temperatureSteps[i+1].starts_at && tempset1 == temperatureSteps[i].temperature){
-          setFerm1((int) temperatureSteps[i+1].temperature);
-          break;
-        }
-      }
+  } else if (currentTemperatureStep < 9){ // We have only 10 steps, so do not move beyond that point
+
+    if (temperatureSteps[currentTemperatureStep + 1].temperature > 0 && temperatureSteps[currentTemperatureStep + 1].hours > 0 && hoursPassedSinceSteppedControlModeStarted >= temperatureSteps[currentTemperatureStep + 1].starts_at){        
+        setFerm1((int) temperatureSteps[currentTemperatureStep + 1].temperature);
+        setCurrentTemperatureStep(currentTemperatureStep + 1);
     }
   }
 }
@@ -167,6 +164,16 @@ int readElapsedHoursFromEEPROM(){
   byte days_passed = EEPROM.read(EEPROM_ADDR_DAYS_PASSED);
 
   return (days_passed * 24) + hours_passed;
+}
+
+byte readCurrentTemperatureStepFromEEPROM(){
+  return EEPROM.read(EEPROM_ADDR_CURRENT_TEMPERATURE_STEP);
+}
+
+void setCurrentTemperatureStep(byte step){
+  currentTemperatureStep = (byte) step;
+  EEPROM.put(EEPROM_ADDR_CURRENT_TEMPERATURE_STEP, (byte) step);
+  EEPROM.commit();
 }
 
 void loadSteppedTemperaturesFromEEPROM(){

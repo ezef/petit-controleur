@@ -47,6 +47,8 @@
     #define EEPROM_ADDR_TEMP10_VALUE 22
     #define EEPROM_ADDR_TEMP10_HOURS 23
 
+    #define EEPROM_ADDR_CURRENT_TEMPERATURE_STEP 24
+
     #define RELAY1 5 
 
     #define ONE_WIRE_BUS 14
@@ -62,6 +64,7 @@
     extern float tempsensada1;
 
     extern byte temperatureControlMode;
+    extern byte currentTemperatureStep; // Step in which the stepped temperature control mode is
 
     extern int hoursPassedSinceSteppedControlModeStarted;
 

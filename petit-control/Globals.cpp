@@ -3,6 +3,7 @@
 byte relay1 = 0;
 float tempsensada1;
 byte temperatureControlMode;
+byte currentTemperatureStep;
 byte tempset1;
 int hoursPassedSinceSteppedControlModeStarted;
 
