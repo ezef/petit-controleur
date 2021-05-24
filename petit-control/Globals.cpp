@@ -1,14 +1,14 @@
 #include "Globals.h"
 
 byte relay1 = 0;
+byte relay_heat_working = 0;
 float tempsensada1;
+float roomTemperature;
 byte temperatureControlMode;
 byte currentTemperatureStep;
 byte tempset1;
 int hoursPassedSinceSteppedControlModeStarted;
 
-const char* ssid = "THESSID";
-const char* password = "THEPASSWORD";
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);

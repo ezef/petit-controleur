@@ -35,6 +35,10 @@ void setup(void) {
 
   pinMode(RELAY1, OUTPUT);
   digitalWrite(RELAY1,HIGH);
+
+  pinMode(RELAY_HEAT, OUTPUT);
+  digitalWrite(RELAY_HEAT,HIGH);
+  control();
 }
 
 void loop(void) {

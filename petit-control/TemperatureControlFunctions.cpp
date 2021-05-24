@@ -13,29 +13,60 @@ TempStep temperatureSteps[10] = {
   {0,0,0}
 };
 
+// 28EE 3A15 1816 01D3
+uint8_t sensor_fridge_address[8] = { 0x28, 0xEE, 0x3A, 0x15, 0x18, 0x16, 0x01, 0xD3 };
+// 28EE E30F 1516 02AF
+uint8_t sensor_ambience_address[8] = { 0x28, 0xEE, 0xE3, 0x0F, 0x15, 0x16, 0x02, 0xAF };
 
 void getTemps(){
   sensors.requestTemperatures();
-  tempsensada1= sensors.getTempCByIndex(0);
+  tempsensada1 = sensors.getTempC(sensor_fridge_address);
+  roomTemperature = sensors.getTempC(sensor_ambience_address);   
 }
 
 void control(){
-  getTemps();
-  apiPostData(tempsensada1);
-  
-  if (tempsensada1 > tempset1 + HISTERESIS) {
-    digitalWrite(RELAY1, LOW);
-    Serial.print("Relay 1 ON - T1:");
-    Serial.println(tempsensada1);
-    relay1=true;
-  } else {
-    if (tempsensada1 < tempset1 - HISTERESIS) {
-      digitalWrite(RELAY1,HIGH);
-      Serial.print("Relay 1 OFF- T1:");
+  getTemps();  
+    
+  if (roomTemperature > tempset1){
+    // Turn off heat actuator in case it was ON
+    digitalWrite(RELAY_HEAT,HIGH);
+    relay_heat_working = false;
+
+    // Cold actuator should work
+    if (tempsensada1 > tempset1 + HISTERESIS) {
+      digitalWrite(RELAY1, LOW);
+      Serial.print("Relay 1(cold) ON - T1:");
       Serial.println(tempsensada1);
-      relay1=false;
+      relay1=true;
+    } else {
+      if (tempsensada1 < tempset1 - HISTERESIS) {
+        digitalWrite(RELAY1,HIGH);
+        Serial.print("Relay 1(cold) OFF- T1:");
+        Serial.println(tempsensada1);
+        relay1 = false;
+      }
     }
-  } 
+  } else {
+    // Turn off cold actuator in case it was ON
+    digitalWrite(RELAY1,HIGH);
+    relay1 = false;
+
+    // Heat actuator should work
+    if (tempsensada1 < tempset1 - HISTERESIS) {
+      digitalWrite(RELAY_HEAT, LOW);
+      Serial.print("Relay 1(heat) ON - T1:");
+      Serial.println(tempsensada1);
+      relay_heat_working = true;
+    } else {
+      if (tempsensada1 >= tempset1 + HISTERESIS) {
+        digitalWrite(RELAY_HEAT,HIGH);
+        Serial.print("Relay 1(heat) OFF- T1:");
+        Serial.println(tempsensada1);
+        relay_heat_working = false;
+      }
+    }
+  }
+  apiPostData();
 }
 
 void setFerm1(int new_temp){

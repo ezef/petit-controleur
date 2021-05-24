@@ -102,7 +102,12 @@ String full_html = R"=====(
             <div class="panel-heading">Indicadores</div>
             <div class="panel-body">
               <span class="mr2">
-                Lectura: <span class="label label-primary label-indicator">{{temperature_read}}º</span>
+                Lectura heladera: <span class="label label-primary label-indicator">{{temperature_read}}º</span>
+              </span>
+
+              <br class="visible-xs"><br class="visible-xs">
+              <span class="mr2">
+                T.Amb: <span class="label label-primary label-indicator">{{room_temperature}}º</span>
               </span>
 
               <br class="visible-xs"><br class="visible-xs">
@@ -110,10 +115,18 @@ String full_html = R"=====(
                 Set actual: <span class="label label-default label-indicator">{{current_set_indicator}}º</span>
               </span>
 
+              <br><br>
+              <span class="">
+                Estado actuador frio:
+                {{actuator_indicator}}
+                <!-- <span class="label label-success label-indicator">On</span> -->
+                <!-- <span class="label label-danger label-indicator">Off</span> -->
+              </span>
+
               <br class="visible-xs"><br class="visible-xs">
               <span class="">
-                Estado actuador:
-                {{actuator_indicator}}
+                Estado actuador calor:
+                {{actuator_heat_indicator}}
                 <!-- <span class="label label-success label-indicator">On</span> -->
                 <!-- <span class="label label-danger label-indicator">Off</span> -->
               </span>
@@ -396,6 +409,9 @@ String full_html = R"=====(
   // temperature_read
   full_html.replace("{{temperature_read}}", String(tempsensada1));
 
+  // room_temperature
+  full_html.replace("{{room_temperature}}", String(roomTemperature));
+
   // current_set_indicator
   full_html.replace("{{current_set_indicator}}", String(tempset1));
 
@@ -403,6 +419,7 @@ String full_html = R"=====(
   const char * actuator_on_html = "<span class='label label-success label-indicator'>On</span>";
   const char * actuator_off_html = "<span class='label label-danger label-indicator'>Off</span>";
   full_html.replace("{{actuator_indicator}}", relay1 ? actuator_on_html : actuator_off_html );
+  full_html.replace("{{actuator_heat_indicator}}", relay_heat_working ? actuator_on_html : actuator_off_html );
 
 
   const char * mode_indicator_on_html = "<span class='label label-success pull-right'>Activado</span>";

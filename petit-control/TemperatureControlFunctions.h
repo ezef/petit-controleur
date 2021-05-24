@@ -13,6 +13,9 @@
 
   extern TempStep temperatureSteps[10];
 
+  extern uint8_t sensor_fridge_address[8];
+  extern uint8_t sensor_ambience_address[8];
+
   void setferm1(int new_temp);
   void getTemps();
   void control();

@@ -8,9 +8,9 @@
     #include <ESP8266WebServer.h>
     #include <OneWire.h>
     #include <DallasTemperature.h>
+    #include "Secrets.h"
 
     #define DEBUG_ON // Comment this to disable debugging
-
     
     //
     // Direcciones de la EEPROM
@@ -50,18 +50,20 @@
     #define EEPROM_ADDR_CURRENT_TEMPERATURE_STEP 24
 
     #define RELAY1 5 
+    #define RELAY_HEAT 4 // TODO check this in the PCB
+    // #define RELAY3 0 
+    // #define RELAY4 2 
 
     #define ONE_WIRE_BUS 14
     #define TEMPERATURE_PRECISION 9
     #define HISTERESIS 0.3
 
-    extern const char* ssid;
-    extern const char* password;
-
     extern byte tempset1;
     extern byte relay1; // Extern means declared as global variable
+    extern byte relay_heat_working; // Extern means declared as global variable
 
     extern float tempsensada1;
+    extern float roomTemperature;
 
     extern byte temperatureControlMode;
     extern byte currentTemperatureStep; // Step in which the stepped temperature control mode is

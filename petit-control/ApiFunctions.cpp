@@ -1,11 +1,13 @@
 #include "ApiFunctions.h"
 
-void apiPostData(float temperature){
+void apiPostData(){
   if(WiFi.status()== WL_CONNECTED){
     
     Serial.println("API posting data: ");
     Serial.print("    Temp sensada:");
-    Serial.println(temperature);
+    Serial.println(tempsensada1);
+    Serial.print("    Temp Ambiente:");
+    Serial.println(roomTemperature);
     Serial.print("    Temp seteada:");
     Serial.println(tempset1);
     
@@ -13,9 +15,15 @@ void apiPostData(float temperature){
     
     String serverPath = "http://home.ezefsoftware.com.ar:8100/api/temperature?"; // 167.71.59.68
     serverPath += "temperature_read=";
-    serverPath += temperature;
+    serverPath += tempsensada1;
     serverPath += "&temperature_set=";
     serverPath += tempset1;
+    serverPath += "&room_temperature=";
+    serverPath += roomTemperature;
+    serverPath += "&cold_actuator=";
+    serverPath += relay1 ? "on" : "off";
+    serverPath += "&heat_actuator=";
+    serverPath += relay_heat_working ? "on" : "off";
     
     Serial.println(serverPath);
 
