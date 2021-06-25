@@ -71,7 +71,16 @@ void control(){
 
 void setFerm1(int new_temp){
   Serial.print(" Seteo de Ferm 1: ");
-  Serial.println(server.arg("tempset"));
+  Serial.println(new_temp);
+
+  // Failsafe check in case temps were wrongly out of range, avoid breaking actuators and fridge
+  if (new_temp > 23){
+    new_temp = 22;
+    Serial.println(server.arg("TEMPSET fuera de rango, seteando a 22 grados"));
+  } else if (new_temp < 1){
+    new_temp = 1;
+    Serial.println(server.arg("TEMPSET fuera de rango, seteando a 1 grados"));
+  }
 
   tempset1 = (byte) new_temp;
   EEPROM.put(ADDR1,tempset1);
